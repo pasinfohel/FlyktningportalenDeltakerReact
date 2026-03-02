@@ -138,7 +138,7 @@ export function FravaerFormScreen({ route, navigation }: Props) {
       {!isReadonly && (
         <PrimaryButton
           label="Lagre"
-          loadingLabel="Lagrer..."
+          loadingLabel="Lagre"
           icon="content-save-outline"
           size="md"
           textSize={ty.buttonMd}
