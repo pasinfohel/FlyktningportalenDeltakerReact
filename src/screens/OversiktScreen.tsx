@@ -30,14 +30,14 @@ export function OversiktOppmoteScreen({ navigation }: OppmoteProps) {
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.title, { fontSize: ty.titleXL }]}>Oppmote</Text>
+      <Text style={[styles.title, { fontSize: ty.titleXL }]}>Oppmøte</Text>
       <View style={styles.listArea}>
         <FlatList
           data={records}
           keyExtractor={(item) => item.socio_deltakelseid}
           contentContainerStyle={records.length === 0 ? styles.emptyList : undefined}
           ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
-          ListEmptyComponent={<Text style={[styles.emptyText, { fontSize: ty.emptyState }]}>Ingen oppmote funnet.</Text>}
+          ListEmptyComponent={<Text style={[styles.emptyText, { fontSize: ty.emptyState }]}>Ingen oppmøte funnet.</Text>}
           renderItem={({ item }) => (
             <RecordCard
               record={item}
@@ -96,14 +96,14 @@ export function OversiktFravaerScreen({ navigation }: FravaerProps) {
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.title, { fontSize: ty.titleXL }]}>Fravaer</Text>
+      <Text style={[styles.title, { fontSize: ty.titleXL }]}>Fravær</Text>
       <View style={styles.listArea}>
         <FlatList
           data={records}
           keyExtractor={(item) => item.socio_deltakelseid}
           contentContainerStyle={records.length === 0 ? styles.emptyList : undefined}
           ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
-          ListEmptyComponent={<Text style={[styles.emptyText, { fontSize: ty.emptyState }]}>Ingen fravaer funnet.</Text>}
+          ListEmptyComponent={<Text style={[styles.emptyText, { fontSize: ty.emptyState }]}>Ingen fravær funnet.</Text>}
           renderItem={({ item }) => (
             <RecordCard
               record={item}

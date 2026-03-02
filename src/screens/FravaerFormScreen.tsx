@@ -9,7 +9,6 @@ import { useDeleteMutation, useDeltakelser, useFravaerMutation } from "../hooks/
 import { useTypography } from "../hooks/useTypography";
 import { RootStackParamList } from "../navigation/types";
 import { AbsenceFormValues, Fravaerstype } from "../types/domain";
-import { getStemplingCutoff } from "../utils/date";
 
 type Props = NativeStackScreenProps<RootStackParamList, "FravaerForm">;
 
@@ -17,9 +16,10 @@ export function FravaerFormScreen({ route, navigation }: Props) {
   const ty = useTypography();
   const { data = [] } = useDeltakelser();
   const record = data.find((r) => r.socio_deltakelseid === route.params?.recordId);
-  const isReadonly = Boolean(record && new Date(record.socio_deltakelse_fra) < getStemplingCutoff());
+  const isReadonly = false;
   const mutation = useFravaerMutation(record);
   const deleteMutation = useDeleteMutation();
+  const isBusy = mutation.isPending || deleteMutation.isPending;
 
   const [fromDate, setFromDate] = useState(
     record ? dayjs(record.socio_deltakelse_fra).format("YYYY-MM-DD") : dayjs().format("YYYY-MM-DD"),
@@ -38,9 +38,9 @@ export function FravaerFormScreen({ route, navigation }: Props) {
   const [fravaerstype, setFravaerstype] = useState<number>(record?.socio_fravrstype ?? Fravaerstype.Syk);
 
   const title = useMemo(() => {
-    if (!record) return "Registrer fravaer";
-    return isReadonly ? "Registrert fravaer" : "Rediger fravaer";
-  }, [isReadonly, record]);
+    if (!record) return "Registrer fravær";
+    return "Rediger fravær";
+  }, [record]);
 
   const onSave = () => {
     const from = parseDateInput(fromDate);
@@ -51,10 +51,6 @@ export function FravaerFormScreen({ route, navigation }: Props) {
     }
     if (to < from) {
       Alert.alert("Feil", "Til-dato ma vaere lik eller etter Fra-dato.");
-      return;
-    }
-    if (from < getStemplingCutoff()) {
-      Alert.alert("Feil", "Du kan ikke registrere fravaer for eldre perioder.");
       return;
     }
     if (!allDay) {
@@ -99,7 +95,6 @@ export function FravaerFormScreen({ route, navigation }: Props) {
         value={fromDate}
         onChange={setFromDate}
         readOnly={isReadonly}
-        minDate={dayjs(getStemplingCutoff()).format("YYYY-MM-DD")}
         maxDate={dayjs().add(1, "month").format("YYYY-MM-DD")}
       />
       <DatePickerField
@@ -146,21 +141,26 @@ export function FravaerFormScreen({ route, navigation }: Props) {
       {!isReadonly && (
         <PrimaryButton
           label="Lagre"
+          loadingLabel="Lagrer..."
           icon="content-save-outline"
           size="md"
           textSize={ty.buttonMd}
           iconSize={ty.iconMd}
+          loading={mutation.isPending}
           onPress={onSave}
         />
       )}
       {!!record && !isReadonly && (
         <PrimaryButton
           label="Slett"
+          loadingLabel="Sletter..."
           icon="delete-outline"
           tone="danger"
           size="md"
           textSize={ty.buttonMd}
           iconSize={ty.iconMd}
+          loading={deleteMutation.isPending}
+          disabled={isBusy && !deleteMutation.isPending}
           onPress={() =>
             deleteMutation.mutate(record.socio_deltakelseid, {
               onSuccess: () => navigation.goBack(),
@@ -176,6 +176,7 @@ export function FravaerFormScreen({ route, navigation }: Props) {
         tone="muted"
         textSize={ty.buttonMd}
         iconSize={ty.iconMd}
+        disabled={isBusy}
         onPress={() => navigation.goBack()}
       />
     </ScrollView>

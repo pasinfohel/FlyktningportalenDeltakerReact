@@ -19,6 +19,7 @@ import {
 import { useAuth } from "../context/AuthContext";
 
 const queryKey = ["deltakelser"];
+type DeltakelserSnapshot = DeltakelseRecord[] | undefined;
 
 export function useDeltakelser() {
   const { accessToken, profile } = useAuth();
@@ -59,7 +60,29 @@ export function useStemplingMutations() {
       const fnr = await hentFnrForInnloggetBruker({ accessToken, oid: profile.oid });
       await stempleInn({ accessToken, fnr });
     },
-    onSuccess: async () => {
+    onMutate: async () => {
+      await qc.cancelQueries({ queryKey });
+      const previous = qc.getQueryData<DeltakelseRecord[]>(queryKey);
+      const now = new Date().toISOString();
+      const optimistic: DeltakelseRecord = {
+        socio_deltakelseid: `tmp-${Date.now()}`,
+        socio_deltakelse_fra: now,
+        socio_deltakelse_til: null,
+        socio_deltakelsetype: DeltakelseType.Tilstede,
+        socio_registreringsaktivitet: Registreringsaktivitet.StempletInn,
+        statecode: 0,
+        statuscode: 1,
+        createdon: now,
+      };
+      qc.setQueryData<DeltakelseRecord[]>(queryKey, (old = []) => [optimistic, ...old]);
+      return { previous };
+    },
+    onError: (_err, _vars, ctx: { previous: DeltakelserSnapshot } | undefined) => {
+      if (ctx?.previous) {
+        qc.setQueryData(queryKey, ctx.previous);
+      }
+    },
+    onSettled: async () => {
       await qc.invalidateQueries({ queryKey });
     },
   });
@@ -69,7 +92,29 @@ export function useStemplingMutations() {
       if (!accessToken) throw new Error("Ikke innlogget");
       await stempleUt({ accessToken, recordId });
     },
-    onSuccess: async () => {
+    onMutate: async (recordId: string) => {
+      await qc.cancelQueries({ queryKey });
+      const previous = qc.getQueryData<DeltakelseRecord[]>(queryKey);
+      const now = new Date().toISOString();
+      qc.setQueryData<DeltakelseRecord[]>(queryKey, (old = []) =>
+        old.map((r) =>
+          r.socio_deltakelseid === recordId
+            ? {
+                ...r,
+                socio_deltakelse_til: now,
+                socio_registreringsaktivitet: Registreringsaktivitet.StempletUt,
+              }
+            : r,
+        ),
+      );
+      return { previous };
+    },
+    onError: (_err, _vars, ctx: { previous: DeltakelserSnapshot } | undefined) => {
+      if (ctx?.previous) {
+        qc.setQueryData(queryKey, ctx.previous);
+      }
+    },
+    onSettled: async () => {
       await qc.invalidateQueries({ queryKey });
     },
   });

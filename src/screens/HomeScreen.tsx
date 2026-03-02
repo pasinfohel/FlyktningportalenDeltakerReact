@@ -81,7 +81,7 @@ export function HomeScreen({ navigation }: Props) {
             }
           />
           <PrimaryButton
-            label="OPPMOTE"
+            label="OPPMØTE"
             icon="format-list-bulleted"
             iconPosition="right"
             size="lg"
@@ -91,7 +91,7 @@ export function HomeScreen({ navigation }: Props) {
             onPress={() => navigation.navigate("OversiktOppmote")}
           />
           <PrimaryButton
-            label="FRAVAER"
+            label="FRAVÆR"
             icon="calendar-remove-outline"
             iconPosition="right"
             size="lg"

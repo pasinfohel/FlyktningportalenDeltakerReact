@@ -1,4 +1,12 @@
-import { Pressable, StyleProp, StyleSheet, Text, View, ViewStyle } from "react-native";
+import {
+  ActivityIndicator,
+  Pressable,
+  StyleProp,
+  StyleSheet,
+  Text,
+  View,
+  ViewStyle,
+} from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { theme } from "../config/theme";
 import { useTypography } from "../hooks/useTypography";
@@ -14,6 +22,8 @@ type Props = {
   iconPosition?: "left" | "right";
   textSize?: number;
   iconSize?: number;
+  loading?: boolean;
+  loadingLabel?: string;
 };
 
 export function PrimaryButton({
@@ -27,25 +37,31 @@ export function PrimaryButton({
   iconPosition = "left",
   textSize,
   iconSize,
+  loading,
+  loadingLabel,
 }: Props) {
   const ty = useTypography();
   const resolvedTextSize = textSize ?? (size === "lg" ? ty.buttonLg : ty.buttonMd);
   const resolvedIconSize = iconSize ?? (size === "lg" ? ty.iconLg : ty.iconMd);
+  const isDisabled = Boolean(disabled || loading);
+  const renderedLabel = loadingLabel ?? label;
   return (
     <Pressable
       onPress={onPress}
-      disabled={disabled}
+      disabled={isDisabled}
       style={[
         styles.button,
         size === "lg" ? styles.buttonLg : styles.buttonMd,
         tone === "danger" && styles.danger,
         tone === "muted" && styles.muted,
-        disabled && styles.disabled,
+        isDisabled && styles.disabled,
         style,
       ]}
     >
       <View style={styles.content}>
-        {icon && iconPosition === "left" ? (
+        {loading ? (
+          <ActivityIndicator size="small" color={theme.colors.text} />
+        ) : icon && iconPosition === "left" ? (
           <MaterialCommunityIcons
             name={icon}
             size={resolvedIconSize}
@@ -59,9 +75,9 @@ export function PrimaryButton({
             { fontSize: resolvedTextSize },
           ]}
         >
-          {label}
+          {renderedLabel}
         </Text>
-        {icon && iconPosition === "right" ? (
+        {!loading && icon && iconPosition === "right" ? (
           <MaterialCommunityIcons
             name={icon}
             size={resolvedIconSize}

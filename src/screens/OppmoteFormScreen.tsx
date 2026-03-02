@@ -9,7 +9,6 @@ import { useDeleteMutation, useDeltakelser, useOppmoteMutation } from "../hooks/
 import { useTypography } from "../hooks/useTypography";
 import { RootStackParamList } from "../navigation/types";
 import { AttendanceFormValues } from "../types/domain";
-import { getStemplingCutoff } from "../utils/date";
 
 type Props = NativeStackScreenProps<RootStackParamList, "OppmoteForm">;
 
@@ -17,9 +16,10 @@ export function OppmoteFormScreen({ route, navigation }: Props) {
   const ty = useTypography();
   const { data = [] } = useDeltakelser();
   const record = data.find((r) => r.socio_deltakelseid === route.params?.recordId);
-  const isReadonly = Boolean(record && new Date(record.socio_deltakelse_fra) < getStemplingCutoff());
+  const isReadonly = false;
   const mutation = useOppmoteMutation(record);
   const deleteMutation = useDeleteMutation();
+  const isBusy = mutation.isPending || deleteMutation.isPending;
 
   const [dateInput, setDateInput] = useState(
     record ? dayjs(record.socio_deltakelse_fra).format("YYYY-MM-DD") : dayjs().format("YYYY-MM-DD"),
@@ -31,9 +31,9 @@ export function OppmoteFormScreen({ route, navigation }: Props) {
   const [comment, setComment] = useState(record?.socio_beskrivelse ?? "");
 
   const title = useMemo(() => {
-    if (!record) return "Registrer oppmote";
-    return isReadonly ? "Registrert oppmote" : "Rediger oppmote";
-  }, [isReadonly, record]);
+    if (!record) return "Registrer oppmøte";
+    return "Rediger oppmøte";
+  }, [record]);
 
   const onSave = () => {
     const date = parseDateInput(dateInput);
@@ -49,10 +49,6 @@ export function OppmoteFormScreen({ route, navigation }: Props) {
     });
     if (timeError) {
       Alert.alert("Feil", timeError);
-      return;
-    }
-    if (date < getStemplingCutoff()) {
-      Alert.alert("Feil", "Du kan ikke opprette eller redigere oppmote for eldre perioder.");
       return;
     }
     if (comment.length > 150) {
@@ -81,7 +77,6 @@ export function OppmoteFormScreen({ route, navigation }: Props) {
         value={dateInput}
         onChange={setDateInput}
         readOnly={isReadonly}
-        minDate={dayjs(getStemplingCutoff()).format("YYYY-MM-DD")}
         maxDate={dayjs().format("YYYY-MM-DD")}
       />
       <TimeRow
@@ -114,21 +109,26 @@ export function OppmoteFormScreen({ route, navigation }: Props) {
       {!isReadonly && (
         <PrimaryButton
           label="Lagre"
+          loadingLabel="Lagrer..."
           icon="content-save-outline"
           size="md"
           textSize={ty.buttonMd}
           iconSize={ty.iconMd}
+          loading={mutation.isPending}
           onPress={onSave}
         />
       )}
       {!!record && !isReadonly && (
         <PrimaryButton
           label="Slett"
+          loadingLabel="Sletter..."
           icon="delete-outline"
           tone="danger"
           size="md"
           textSize={ty.buttonMd}
           iconSize={ty.iconMd}
+          loading={deleteMutation.isPending}
+          disabled={isBusy && !deleteMutation.isPending}
           onPress={() =>
             deleteMutation.mutate(record.socio_deltakelseid, {
               onSuccess: () => navigation.goBack(),
@@ -144,6 +144,7 @@ export function OppmoteFormScreen({ route, navigation }: Props) {
         tone="muted"
         textSize={ty.buttonMd}
         iconSize={ty.iconMd}
+        disabled={isBusy}
         onPress={() => navigation.goBack()}
       />
     </ScrollView>

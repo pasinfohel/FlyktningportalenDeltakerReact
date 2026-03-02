@@ -85,13 +85,13 @@ Forventet:
 
 - Data hentes pa nytt uten feil.
 
-## 5. Oversikt oppmote
+## 5. Oversikt oppmøte
 
-### TC-OPP-OV-01: Liste viser oppmote
+### TC-OPP-OV-01: Liste viser oppmøte
 
 Steg:
 
-1. Fra startside, trykk `OPPMOTE`
+1. Fra startside, trykk `OPPMØTE`
 
 Forventet:
 
@@ -108,7 +108,7 @@ Forventet:
 - Kun registreringer med aktivitet `Lukket apen stempling automatisk` vises.
 - Knappetekst byttes til `Vis alle`.
 
-### TC-OPP-OV-03: Ny oppmote
+### TC-OPP-OV-03: Ny oppmøte
 
 Steg:
 
@@ -116,11 +116,11 @@ Steg:
 
 Forventet:
 
-- Skjerm for registrering av oppmote apnes i ny-modus.
+- Skjerm for registrering av oppmøte apnes i ny-modus.
 
-## 6. Oppmote-form
+## 6. Oppmøte-form
 
-### TC-OPP-FORM-01: Lagre gyldig oppmote
+### TC-OPP-FORM-01: Lagre gyldig oppmøte
 
 Steg:
 
@@ -170,11 +170,11 @@ Forventet:
 - Feilmelding vises.
 - Ingen lagring.
 
-### TC-OPP-FORM-05: Slett oppmote
+### TC-OPP-FORM-05: Slett oppmøte
 
 Steg:
 
-1. Apne eksisterende oppmote
+1. Apne eksisterende oppmøte
 2. Trykk `Slett`
 
 Forventet:
@@ -186,26 +186,26 @@ Forventet:
 
 Steg:
 
-1. Apne en gammel oppmote (eldre enn cutoff)
+1. Apne et gammelt oppmøte (eldre enn cutoff)
 
 Forventet:
 
 - Skjerm er read-only.
 - `Lagre`/`Slett` vises ikke.
 
-## 7. Oversikt fravaer
+## 7. Oversikt fravær
 
-### TC-FRA-OV-01: Liste viser fravaer
+### TC-FRA-OV-01: Liste viser fravær
 
 Steg:
 
-1. Fra startside, trykk `FRAVAER`
+1. Fra startside, trykk `FRAVÆR`
 
 Forventet:
 
-- Kun registreringer av type `Fravaer` vises.
+- Kun registreringer av type `Fravær` vises.
 
-### TC-FRA-OV-02: Nytt fravaer
+### TC-FRA-OV-02: Nytt fravær
 
 Steg:
 
@@ -213,9 +213,9 @@ Steg:
 
 Forventet:
 
-- Fravaer-form apnes i ny-modus.
+- Fravær-form apnes i ny-modus.
 
-## 8. Fravaer-form
+## 8. Fravær-form
 
 ### TC-FRA-FORM-01: Lagre heldag
 
@@ -266,11 +266,11 @@ Forventet:
 
 - Feilmelding vises.
 
-### TC-FRA-FORM-05: Slett fravaer
+### TC-FRA-FORM-05: Slett fravær
 
 Steg:
 
-1. Apne eksisterende fravaer
+1. Apne eksisterende fravær
 2. Trykk `Slett`
 
 Forventet:
@@ -306,14 +306,14 @@ Forventet:
 
 Etter testene over, sjekk noen records direkte i Dataverse:
 
-- Oppmote records har riktig type og aktivitet.
-- Fravaer records har riktig type, arsak og heldag-felt.
+- Oppmøte records har riktig type og aktivitet.
+- Fravær records har riktig type, arsak og heldag-felt.
 - Slettede records er inaktive.
 
 ## 11. Exit-kriterier
 
 Test godkjennes nar:
 
-- Alle kritiske flyter (login, INN/UT, lagre/slette oppmote/fravaer) er bestatt.
+- Alle kritiske flyter (login, INN/UT, lagre/slette oppmøte/fravær) er bestatt.
 - Ingen blokkende feil i validering eller navigasjon.
 - Dataverse-data stemmer med forventede felter/verdier.

@@ -7,8 +7,8 @@ Denne dokumentasjonen beskriver mobilappen i `flyktningportalen-mobile` som er l
 Appen skal levere samme kjernefunksjonalitet som Canvas-appen:
 
 - INN/UT-stempling
-- Oversikt over oppmote
-- Oversikt over fravaer
+- Oversikt over oppmøte
+- Oversikt over fravær
 - Opprette/redigere/slette registreringer
 - Innlogging med Entra ID
 - Bruk av samme Dataverse-data og option sets
@@ -146,10 +146,10 @@ Fil: `src/types/domain.ts`
 - `INN` er disablet hvis aaapen stempling finnes.
 - `UT` er disablet hvis aaapen stempling ikke finnes.
 - Navigasjon:
-  - `OPPMOTE` -> oversikt oppmote
-  - `FRAVAER` -> oversikt fravaer
+  - `OPPMØTE` -> oversikt oppmøte
+  - `FRAVÆR` -> oversikt fravær
 
-## 7.3 Oversikt oppmote
+## 7.3 Oversikt oppmøte
 
 - Lister registreringer med `DeltakelseType.Tilstede`.
 - Filterknapp `Maa rettes` viser kun elementer med aktivitet `LukketAutomatisk`.
@@ -158,14 +158,14 @@ Fil: `src/types/domain.ts`
   - Maa rettes / Vis alle
   - Nytt
 
-## 7.4 Oversikt fravaer
+## 7.4 Oversikt fravær
 
 - Lister registreringer med `DeltakelseType.Fravaer`.
 - Footer med:
   - Tilbake
   - Nytt
 
-## 7.5 Oppmote-form
+## 7.5 Oppmøte-form
 
 - New / Edit / Readonly styres av valgt record + cutoff-regel.
 - Validering:
@@ -176,7 +176,7 @@ Fil: `src/types/domain.ts`
   - dato eldre enn cutoff stoppes
 - Slett = soft delete.
 
-## 7.6 Fravaer-form
+## 7.6 Fravær-form
 
 - Stotter heldag/fleredager.
 - Validering:
@@ -217,8 +217,8 @@ Status: **Implementert i kode**, men maa bekreftes med manuell test i riktig mil
 - [x] Startside har store vertikale handlingsknapper
 - [x] Statusfelt viser ikke inn / inn siden / ut kl.
 - [x] INN/UT enable/disable styres av aaapen stempling
-- [x] Oppmote-oversikt har filter "Maa rettes"
-- [x] Fravaer-oversikt viser kun fravaer
+- [x] Oppmøte-oversikt har filter "Maa rettes"
+- [x] Fravær-oversikt viser kun fravær
 - [x] New/Edit/View-logikk med cutoff pa formskjermer
 - [x] Soft delete brukes i stedet for hard delete
 - [x] Kommentar-felt har tegnbegrensning
@@ -288,7 +288,7 @@ Ved endringer:
 - sjekke lints
 - teste manuelle flyter:
   - login -> INN -> UT
-  - nytt oppmote/fravaer
+  - nytt oppmøte/fravær
   - redigering
   - slett
   - cutoff/read-only
