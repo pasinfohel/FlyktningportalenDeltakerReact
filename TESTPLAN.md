@@ -5,7 +5,7 @@ Denne testplanen er laget for manuell verifisering av mobilappen.
 ## 1. Forutsetninger
 
 - `.env` er konfigurert med gyldige verdier.
-- App Registration i Entra ID er satt opp med redirect URI `flyktningportalenmobile://`.
+- App Registration i Entra ID er satt opp med web redirect URI `https://<din-app>.azurestaticapps.net/auth` (og/eller lokal `http://localhost:8081/auth`).
 - Testbruker har tilgang til Dataverse-miljoet.
 - Appen starter uten build-feil.
 
@@ -13,7 +13,7 @@ Denne testplanen er laget for manuell verifisering av mobilappen.
 
 1. Kjor `npm install`
 2. Kjor `npm run start`
-3. Start app i Expo Go/emulator
+3. Start app i nettleser (`npm run web`)
 
 Forventet:
 
@@ -97,11 +97,11 @@ Forventet:
 
 - Kun registreringer av type `Tilstede` vises.
 
-### TC-OPP-OV-02: Filter "Maa rettes"
+### TC-OPP-OV-02: Filter "Må rettes"
 
 Steg:
 
-1. Trykk `Maa rettes`
+1. Trykk `Må rettes`
 
 Forventet:
 

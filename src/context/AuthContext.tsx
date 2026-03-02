@@ -1,6 +1,4 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { Platform } from "react-native";
-import * as SecureStore from "expo-secure-store";
 import { decode } from "base-64";
 import { UserProfile } from "../types/domain";
 
@@ -17,29 +15,30 @@ const ACCESS_TOKEN_KEY = "fp_access_token";
 const PROFILE_KEY = "fp_profile";
 
 async function storageGet(key: string): Promise<string | null> {
-  if (Platform.OS === "web") {
+  try {
     if (typeof window === "undefined") return null;
     return window.localStorage.getItem(key);
+  } catch {
+    return null;
   }
-  return SecureStore.getItemAsync(key);
 }
 
 async function storageSet(key: string, value: string): Promise<void> {
-  if (Platform.OS === "web") {
+  try {
     if (typeof window === "undefined") return;
     window.localStorage.setItem(key, value);
-    return;
+  } catch {
+    // localStorage can be unavailable in strict/private browser modes.
   }
-  await SecureStore.setItemAsync(key, value);
 }
 
 async function storageDelete(key: string): Promise<void> {
-  if (Platform.OS === "web") {
+  try {
     if (typeof window === "undefined") return;
     window.localStorage.removeItem(key);
-    return;
+  } catch {
+    // best effort cleanup
   }
-  await SecureStore.deleteItemAsync(key);
 }
 
 function parseJwt(token: string): Record<string, unknown> | null {
@@ -54,14 +53,19 @@ function parseJwt(token: string): Record<string, unknown> | null {
   }
 }
 
-function profileFromIdToken(idToken?: string): UserProfile | null {
-  if (!idToken) return null;
-  const parsed = parseJwt(idToken);
+function profileFromTokens(accessToken: string, idToken?: string): UserProfile | null {
+  const parsed = parseJwt(idToken ?? "") ?? parseJwt(accessToken);
   if (!parsed) return null;
+  const oid = String(parsed.oid ?? parsed.objectid ?? "");
+  if (!oid) return null;
+  const name = String(
+    parsed.name ?? parsed.preferred_username ?? parsed.upn ?? parsed.unique_name ?? "",
+  );
+  const email = String(parsed.preferred_username ?? parsed.upn ?? parsed.email ?? "");
   return {
-    oid: String(parsed.oid ?? ""),
-    name: String(parsed.name ?? ""),
-    email: String(parsed.preferred_username ?? parsed.upn ?? ""),
+    oid,
+    name,
+    email,
   };
 }
 
@@ -76,7 +80,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         storageGet(PROFILE_KEY),
       ]);
       if (storedToken) setAccessToken(storedToken);
-      if (storedProfile) setProfile(JSON.parse(storedProfile) as UserProfile);
+      if (storedProfile) {
+        setProfile(JSON.parse(storedProfile) as UserProfile);
+      } else if (storedToken) {
+        setProfile(profileFromTokens(storedToken));
+      }
     }
     void hydrate();
   }, []);
@@ -86,12 +94,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       accessToken,
       profile,
       async setSession(token, idToken) {
-        const nextProfile = profileFromIdToken(idToken);
+        const nextProfile = profileFromTokens(token, idToken);
         setAccessToken(token);
         setProfile(nextProfile);
         await storageSet(ACCESS_TOKEN_KEY, token);
         if (nextProfile) {
           await storageSet(PROFILE_KEY, JSON.stringify(nextProfile));
+        } else {
+          await storageDelete(PROFILE_KEY);
         }
       },
       async signOut() {

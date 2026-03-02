@@ -19,7 +19,6 @@ export function LoginScreen() {
   const { setSession } = useAuth();
   const ty = useTypography();
   const redirectUri = AuthSession.makeRedirectUri({
-    scheme: "flyktningportalenmobile",
     path: "auth",
   });
   const missingEnv = validateEnv();

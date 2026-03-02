@@ -11,12 +11,13 @@ import { RootStackParamList } from "./types";
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export function AppNavigator() {
-  const { accessToken } = useAuth();
+  const { accessToken, profile } = useAuth();
+  const isAuthenticated = Boolean(accessToken && profile?.oid);
 
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {!accessToken ? (
+        {!isAuthenticated ? (
           <Stack.Screen name="Login" component={LoginScreen} />
         ) : (
           <>

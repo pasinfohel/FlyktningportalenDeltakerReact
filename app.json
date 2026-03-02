@@ -29,7 +29,6 @@
       "output": "single"
     },
     "plugins": [
-      "expo-secure-store",
       "expo-web-browser"
     ]
   }

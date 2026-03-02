@@ -41,7 +41,7 @@ export function OversiktOppmoteScreen({ navigation }: OppmoteProps) {
           renderItem={({ item }) => (
             <RecordCard
               record={item}
-              rightLabel={isMaaRettes(item) ? "Maa rettes" : undefined}
+              rightLabel={isMaaRettes(item) ? "Må rettes" : undefined}
               onPress={() => navigation.navigate("OppmoteForm", { recordId: item.socio_deltakelseid })}
             />
           )}
@@ -60,7 +60,7 @@ export function OversiktOppmoteScreen({ navigation }: OppmoteProps) {
           iconPosition="left"
         />
         <PrimaryButton
-          label={showMaaRettes ? "Vis alle" : "Maa rettes"}
+          label={showMaaRettes ? "Vis alle" : "Må rettes"}
           icon="alert-outline"
           size="md"
           tone={showMaaRettes ? "muted" : "primary"}

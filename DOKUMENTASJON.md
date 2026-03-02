@@ -21,7 +21,7 @@ I tillegg er layout og font/logikk tilpasset mobil med samme design-intensjon so
 - React Navigation (native stack)
 - React Query (`@tanstack/react-query`)
 - Entra ID OAuth2 PKCE via `expo-auth-session`
-- Lagring av token/session via `expo-secure-store`
+- Lagring av token/session via browser `localStorage` (web/SWA)
 - Dataverse Web API (v9.0) direkte fra app
 
 ## 3. Prosjektstruktur
@@ -83,14 +83,14 @@ EXPO_PUBLIC_DATAVERSE_SCOPE=https://flyktningportalenutvikling.crm4.dynamics.com
 1. `LoginScreen` starter OAuth2 PKCE-flow med `expo-auth-session`.
 2. Bruker logger inn i Entra.
 3. Autorisasjonskode byttes mot access token/id token.
-4. Token lagres i `SecureStore`.
+4. Token/sesjon lagres i browser `localStorage` (web-first/SWA).
 5. `AppNavigator` viser app-skjermene naar `accessToken` finnes.
 
 ### 5.2 Redirect URI
 
-- App scheme: `flyktningportalenmobile://`
-- Maa registreres som redirect URI i Entra App Registration (public client/mobile).
-- For Azure Static Web Apps (web): `https://<din-app>.azurestaticapps.net/auth`
+- Primar redirect URI (SWA/web): `https://<din-app>.azurestaticapps.net/auth`
+- Lokal web redirect (utvikling): `http://localhost:8081/auth` (eller aktuell Expo-port)
+- Valgfritt ved native testing: `flyktningportalenmobile://auth`
 
 ## 6. Dataverse-integrasjon
 
@@ -152,10 +152,10 @@ Fil: `src/types/domain.ts`
 ## 7.3 Oversikt oppmøte
 
 - Lister registreringer med `DeltakelseType.Tilstede`.
-- Filterknapp `Maa rettes` viser kun elementer med aktivitet `LukketAutomatisk`.
+- Filterknapp `Må rettes` viser kun elementer med aktivitet `LukketAutomatisk`.
 - Footer med:
   - Tilbake
-  - Maa rettes / Vis alle
+  - Må rettes / Vis alle
   - Nytt
 
 ## 7.4 Oversikt fravær
@@ -217,7 +217,7 @@ Status: **Implementert i kode**, men maa bekreftes med manuell test i riktig mil
 - [x] Startside har store vertikale handlingsknapper
 - [x] Statusfelt viser ikke inn / inn siden / ut kl.
 - [x] INN/UT enable/disable styres av aaapen stempling
-- [x] Oppmøte-oversikt har filter "Maa rettes"
+- [x] Oppmøte-oversikt har filter "Må rettes"
 - [x] Fravær-oversikt viser kun fravær
 - [x] New/Edit/View-logikk med cutoff pa formskjermer
 - [x] Soft delete brukes i stedet for hard delete

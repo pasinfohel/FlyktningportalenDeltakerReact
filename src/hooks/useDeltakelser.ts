@@ -63,6 +63,9 @@ export function useStemplingMutations() {
     onMutate: async () => {
       await qc.cancelQueries({ queryKey });
       const previous = qc.getQueryData<DeltakelseRecord[]>(queryKey);
+      if (!accessToken || !profile?.oid) {
+        return { previous };
+      }
       const now = new Date().toISOString();
       const optimistic: DeltakelseRecord = {
         socio_deltakelseid: `tmp-${Date.now()}`,
@@ -78,9 +81,7 @@ export function useStemplingMutations() {
       return { previous };
     },
     onError: (_err, _vars, ctx: { previous: DeltakelserSnapshot } | undefined) => {
-      if (ctx?.previous) {
-        qc.setQueryData(queryKey, ctx.previous);
-      }
+      qc.setQueryData(queryKey, ctx?.previous ?? []);
     },
     onSettled: async () => {
       await qc.invalidateQueries({ queryKey });
@@ -95,6 +96,9 @@ export function useStemplingMutations() {
     onMutate: async (recordId: string) => {
       await qc.cancelQueries({ queryKey });
       const previous = qc.getQueryData<DeltakelseRecord[]>(queryKey);
+      if (!accessToken) {
+        return { previous };
+      }
       const now = new Date().toISOString();
       qc.setQueryData<DeltakelseRecord[]>(queryKey, (old = []) =>
         old.map((r) =>
@@ -110,9 +114,7 @@ export function useStemplingMutations() {
       return { previous };
     },
     onError: (_err, _vars, ctx: { previous: DeltakelserSnapshot } | undefined) => {
-      if (ctx?.previous) {
-        qc.setQueryData(queryKey, ctx.previous);
-      }
+      qc.setQueryData(queryKey, ctx?.previous ?? []);
     },
     onSettled: async () => {
       await qc.invalidateQueries({ queryKey });
