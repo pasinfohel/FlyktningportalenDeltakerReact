@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { decode } from "base-64";
 import { UserProfile } from "../types/domain";
@@ -14,6 +15,32 @@ const AuthContext = createContext<AuthState | undefined>(undefined);
 
 const ACCESS_TOKEN_KEY = "fp_access_token";
 const PROFILE_KEY = "fp_profile";
+
+async function storageGet(key: string): Promise<string | null> {
+  if (Platform.OS === "web") {
+    if (typeof window === "undefined") return null;
+    return window.localStorage.getItem(key);
+  }
+  return SecureStore.getItemAsync(key);
+}
+
+async function storageSet(key: string, value: string): Promise<void> {
+  if (Platform.OS === "web") {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem(key, value);
+    return;
+  }
+  await SecureStore.setItemAsync(key, value);
+}
+
+async function storageDelete(key: string): Promise<void> {
+  if (Platform.OS === "web") {
+    if (typeof window === "undefined") return;
+    window.localStorage.removeItem(key);
+    return;
+  }
+  await SecureStore.deleteItemAsync(key);
+}
 
 function parseJwt(token: string): Record<string, unknown> | null {
   try {
@@ -45,8 +72,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     async function hydrate() {
       const [storedToken, storedProfile] = await Promise.all([
-        SecureStore.getItemAsync(ACCESS_TOKEN_KEY),
-        SecureStore.getItemAsync(PROFILE_KEY),
+        storageGet(ACCESS_TOKEN_KEY),
+        storageGet(PROFILE_KEY),
       ]);
       if (storedToken) setAccessToken(storedToken);
       if (storedProfile) setProfile(JSON.parse(storedProfile) as UserProfile);
@@ -62,17 +89,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const nextProfile = profileFromIdToken(idToken);
         setAccessToken(token);
         setProfile(nextProfile);
-        await SecureStore.setItemAsync(ACCESS_TOKEN_KEY, token);
+        await storageSet(ACCESS_TOKEN_KEY, token);
         if (nextProfile) {
-          await SecureStore.setItemAsync(PROFILE_KEY, JSON.stringify(nextProfile));
+          await storageSet(PROFILE_KEY, JSON.stringify(nextProfile));
         }
       },
       async signOut() {
         setAccessToken(null);
         setProfile(null);
         await Promise.all([
-          SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY),
-          SecureStore.deleteItemAsync(PROFILE_KEY),
+          storageDelete(ACCESS_TOKEN_KEY),
+          storageDelete(PROFILE_KEY),
         ]);
       },
     }),
