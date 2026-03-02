@@ -4,6 +4,7 @@ import dayjs from "dayjs";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { DatePickerField } from "../components/DatePickerField";
 import { PrimaryButton } from "../components/PrimaryButton";
+import { TimePickerField } from "../components/TimePickerField";
 import { theme } from "../config/theme";
 import { useDeleteMutation, useDeltakelser, useOppmoteMutation } from "../hooks/useDeltakelser";
 import { useTypography } from "../hooks/useTypography";
@@ -24,10 +25,8 @@ export function OppmoteFormScreen({ route, navigation }: Props) {
   const [dateInput, setDateInput] = useState(
     record ? dayjs(record.socio_deltakelse_fra).format("YYYY-MM-DD") : dayjs().format("YYYY-MM-DD"),
   );
-  const [fromHour, setFromHour] = useState(record ? dayjs(record.socio_deltakelse_fra).format("HH") : "");
-  const [fromMinute, setFromMinute] = useState(record ? dayjs(record.socio_deltakelse_fra).format("mm") : "");
-  const [toHour, setToHour] = useState(record?.socio_deltakelse_til ? dayjs(record.socio_deltakelse_til).format("HH") : "");
-  const [toMinute, setToMinute] = useState(record?.socio_deltakelse_til ? dayjs(record.socio_deltakelse_til).format("mm") : "");
+  const [fromTime, setFromTime] = useState(record ? dayjs(record.socio_deltakelse_fra).format("HH:mm") : "");
+  const [toTime, setToTime] = useState(record?.socio_deltakelse_til ? dayjs(record.socio_deltakelse_til).format("HH:mm") : "");
   const [comment, setComment] = useState(record?.socio_beskrivelse ?? "");
 
   const title = useMemo(() => {
@@ -41,12 +40,7 @@ export function OppmoteFormScreen({ route, navigation }: Props) {
       Alert.alert("Feil", "Ugyldig dato. Bruk format YYYY-MM-DD.");
       return;
     }
-    const timeError = validateTimeRange({
-      fromHour,
-      fromMinute,
-      toHour,
-      toMinute,
-    });
+    const timeError = validateTimeRange({ fromTime, toTime });
     if (timeError) {
       Alert.alert("Feil", timeError);
       return;
@@ -55,12 +49,18 @@ export function OppmoteFormScreen({ route, navigation }: Props) {
       Alert.alert("Feil", "Kommentar kan maks være 150 tegn.");
       return;
     }
+    const from = splitTime(fromTime);
+    const to = splitTime(toTime);
+    if (!from || !to) {
+      Alert.alert("Feil", "Registrer tid.");
+      return;
+    }
     const values: AttendanceFormValues = {
       date,
-      fromHour: normalizeTwoDigits(fromHour),
-      fromMinute: normalizeTwoDigits(fromMinute),
-      toHour: normalizeTwoDigits(toHour),
-      toMinute: normalizeTwoDigits(toMinute),
+      fromHour: from.hour,
+      fromMinute: from.minute,
+      toHour: to.hour,
+      toMinute: to.minute,
       comment: comment.trim(),
     };
     mutation.mutate(values, {
@@ -79,23 +79,17 @@ export function OppmoteFormScreen({ route, navigation }: Props) {
         readOnly={isReadonly}
         maxDate={dayjs().format("YYYY-MM-DD")}
       />
-      <TimeRow
+      <TimePickerField
         label="Fra"
-        hour={fromHour}
-        minute={fromMinute}
-        setHour={setFromHour}
-        setMinute={setFromMinute}
+        value={fromTime}
+        onChange={setFromTime}
         readOnly={isReadonly}
-        ty={ty}
       />
-      <TimeRow
+      <TimePickerField
         label="Til"
-        hour={toHour}
-        minute={toMinute}
-        setHour={setToHour}
-        setMinute={setToMinute}
+        value={toTime}
+        onChange={setToTime}
         readOnly={isReadonly}
-        ty={ty}
       />
       <Field
         label="Kommentar"
@@ -178,49 +172,6 @@ function Field({
   );
 }
 
-function TimeRow({
-  label,
-  hour,
-  minute,
-  setHour,
-  setMinute,
-  readOnly,
-  ty,
-}: {
-  label: string;
-  hour: string;
-  minute: string;
-  setHour: (s: string) => void;
-  setMinute: (s: string) => void;
-  readOnly?: boolean;
-  ty: ReturnType<typeof useTypography>;
-}) {
-  return (
-    <View style={styles.fieldWrap}>
-      <Text style={[styles.label, { fontSize: ty.label }]}>{label}</Text>
-      <View style={styles.timeRow}>
-        <TextInput
-          value={hour}
-          onChangeText={(val) => setHour(sanitizeTimeInput(val))}
-          keyboardType="number-pad"
-          editable={!readOnly}
-          style={[styles.input, styles.timeInput, { fontSize: ty.input }, readOnly && styles.disabled]}
-          maxLength={2}
-        />
-        <Text style={[styles.colon, { fontSize: ty.colon }]}>:</Text>
-        <TextInput
-          value={minute}
-          onChangeText={(val) => setMinute(sanitizeTimeInput(val))}
-          keyboardType="number-pad"
-          editable={!readOnly}
-          style={[styles.input, styles.timeInput, { fontSize: ty.input }, readOnly && styles.disabled]}
-          maxLength={2}
-        />
-      </View>
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -252,18 +203,6 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     color: theme.colors.text,
   },
-  timeRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  timeInput: {
-    width: 84,
-    textAlign: "center",
-  },
-  colon: {
-    fontWeight: "700",
-  },
   disabled: {
     opacity: 0.6,
   },
@@ -273,12 +212,10 @@ const styles = StyleSheet.create({
   },
 });
 
-function sanitizeTimeInput(value: string): string {
-  return value.replace(/[^0-9]/g, "").slice(0, 2);
-}
-
-function normalizeTwoDigits(value: string): string {
-  return value.padStart(2, "0");
+function splitTime(value: string): { hour: string; minute: string } | null {
+  if (!/^\d{2}:\d{2}$/.test(value)) return null;
+  const [hour, minute] = value.split(":");
+  return { hour, minute };
 }
 
 function parseDateInput(value: string): Date | null {
@@ -287,21 +224,19 @@ function parseDateInput(value: string): Date | null {
 }
 
 function validateTimeRange({
-  fromHour,
-  fromMinute,
-  toHour,
-  toMinute,
+  fromTime,
+  toTime,
 }: {
-  fromHour: string;
-  fromMinute: string;
-  toHour: string;
-  toMinute: string;
+  fromTime: string;
+  toTime: string;
 }): string | null {
-  if (!fromHour || !fromMinute || !toHour || !toMinute) return "Registrer tid.";
-  const fh = Number(fromHour);
-  const fm = Number(fromMinute);
-  const th = Number(toHour);
-  const tm = Number(toMinute);
+  const from = splitTime(fromTime);
+  const to = splitTime(toTime);
+  if (!from || !to) return "Registrer tid.";
+  const fh = Number(from.hour);
+  const fm = Number(from.minute);
+  const th = Number(to.hour);
+  const tm = Number(to.minute);
   if ([fh, fm, th, tm].some((n) => Number.isNaN(n))) return "Tid ma vaere tall.";
   if (fh < 0 || fh > 23 || th < 0 || th > 23) return "Timer ma vaere mellom 00 og 23.";
   if (fm < 0 || fm > 59 || tm < 0 || tm > 59) return "Minutter ma vaere mellom 00 og 59.";

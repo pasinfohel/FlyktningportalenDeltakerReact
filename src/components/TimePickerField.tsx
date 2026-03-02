@@ -2,45 +2,29 @@ import type { CSSProperties } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { theme } from "../config/theme";
 import { useTypography } from "../hooks/useTypography";
-import { getNorwegianHoliday } from "../utils/holidays";
 
 type Props = {
   label: string;
   value: string;
-  onChange: (isoDate: string) => void;
+  onChange: (value: string) => void;
   readOnly?: boolean;
-  minDate?: string;
-  maxDate?: string;
 };
 
-export function DatePickerField({
-  label,
-  value,
-  onChange,
-  readOnly,
-  minDate,
-  maxDate,
-}: Props) {
+export function TimePickerField({ label, value, onChange, readOnly }: Props) {
   const ty = useTypography();
-  const selectedHoliday = getNorwegianHoliday(value);
 
   return (
     <View style={styles.wrapper}>
       <Text style={[styles.label, { fontSize: ty.label }]}>{label}</Text>
       <View style={[styles.inputWrap, readOnly && styles.disabled]}>
         <input
-          type="date"
+          type="time"
           value={value}
-          min={minDate}
-          max={maxDate}
           disabled={readOnly}
           onChange={(event) => onChange(event.currentTarget.value)}
           style={webInputStyle}
         />
       </View>
-      {selectedHoliday ? (
-        <Text style={[styles.holidayHint, { fontSize: ty.counter }]}>Helligdag: {selectedHoliday}</Text>
-      ) : null}
     </View>
   );
 }
@@ -56,7 +40,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
   },
-  holidayHint: { color: theme.colors.danger, fontWeight: "600" },
   disabled: { opacity: 0.6 },
 });
 
