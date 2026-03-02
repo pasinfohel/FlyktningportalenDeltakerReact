@@ -63,7 +63,15 @@ async function request<T>(url: string, token: string, init?: RequestInit): Promi
     const text = await res.text();
     throw new Error(`Dataverse error ${res.status}: ${text}`);
   }
-  return (await res.json()) as T;
+  // Dataverse often responds with 204 No Content for create/update requests.
+  if (res.status === 204 || res.status === 205) {
+    return undefined as T;
+  }
+  const text = await res.text();
+  if (!text) {
+    return undefined as T;
+  }
+  return JSON.parse(text) as T;
 }
 
 export async function listMineRegistreringer({
