@@ -1,0 +1,18 @@
+{
+  "name": "Flyktningportalen Deltaker",
+  "short_name": "Flyktningportalen",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f3fbf4",
+  "theme_color": "#f3fbf4",
+  "description": "Registrer oppmøte og fravær i Flyktningportalen.",
+  "lang": "nb-NO",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48 32x32 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}

@@ -3,7 +3,7 @@
 Mobilapp som speiler Canvas-appen i dette repoet:
 
 - INN/UT-stempling
-- Oversikt for oppmote og fravaer
+- Oversikt for oppmøte og fravær
 - Opprette/redigere/slette registreringer
 - Entra ID innlogging
 - Dataverse som datakilde (`socio_deltakelse`)
@@ -65,12 +65,26 @@ Denne appen er satt opp for SWA-distribusjon av web-versjonen:
 
 SWA distribuerer web-klienten. Native distribusjon (App Store/Google Play/MDM) krever egen native build/pipeline.
 
+## PWA-stotte
+
+Appen er satt opp som installbar webapp (PWA-grunnoppsett):
+
+- `public/manifest.webmanifest`
+- `public/sw.js` (service worker)
+- registrering av service worker + manifest i `index.ts`
+
+Merk:
+
+- Android/Chrome vil vanligvis vise install-prompt når kriterier er oppfylt.
+- iOS/Safari bruker "Legg til på hjemskjerm".
+- For best install-opplevelse anbefales egne 192x192 og 512x512 app-ikoner.
+
 ## Datamapping (fra Canvas)
 
 - Tabell: `socio_deltakelse` (`socio_deltakelses`)
 - User-tabell: `systemuser` (`systemusers`)
 - Option sets brukt:
-  - `socio_deltakelsetype` (Tilstede/Fravaer)
+  - `socio_deltakelsetype` (Tilstede/Fravær)
   - `socio_fravrstype` (Syk/Sykt barn/Timeavtale)
   - `socio_registreringsaktivitet`
   - `socio_heldagsfravr`
