@@ -79,6 +79,7 @@ export function LoginScreen() {
     <View style={styles.container}>
       <Text style={[styles.title, { fontSize: ty.titleXL }]}>Flyktningportalen</Text>
       <Text style={[styles.subtitle, { fontSize: ty.bodyS }]}>Logg inn med Entra ID</Text>
+      <Text style={[styles.buildText, { fontSize: ty.caption }]}>Build: {env.buildNumber}</Text>
       {!request ? (
         <ActivityIndicator />
       ) : (
@@ -111,5 +112,10 @@ const styles = StyleSheet.create({
   subtitle: {
     color: theme.colors.muted,
     textAlign: "center",
+  },
+  buildText: {
+    color: theme.colors.muted,
+    textAlign: "center",
+    marginTop: -10,
   },
 });

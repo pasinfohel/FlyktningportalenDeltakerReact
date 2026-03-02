@@ -1,8 +1,7 @@
-import { useEffect, useMemo, useRef } from "react";
-import { ActivityIndicator, Alert, StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { PrimaryButton } from "../components/PrimaryButton";
-import { env } from "../config/env";
 import { theme } from "../config/theme";
 import { useAuth } from "../context/AuthContext";
 import { useDeltakelser, useHomeState, useStemplingMutations } from "../hooks/useDeltakelser";
@@ -17,6 +16,7 @@ import {
 } from "../utils/stampAction";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Home">;
+type QrNoticeTone = "success" | "info" | "error";
 
 export function HomeScreen({ navigation }: Props) {
   const { height } = useWindowDimensions();
@@ -29,6 +29,11 @@ export function HomeScreen({ navigation }: Props) {
   const footerHeight = Math.max(72, Math.round(height * 0.1));
   const mainGap = Math.max(12, Math.round(height * 0.018));
   const hasHandledActionRef = useRef(false);
+  const [qrNotice, setQrNotice] = useState<{
+    tone: QrNoticeTone;
+    title: string;
+    message: string;
+  } | null>(null);
 
   const statusText = useMemo(() => {
     if (!latest) return "Ikke stemplet inn i dag";
@@ -52,23 +57,51 @@ export function HomeScreen({ navigation }: Props) {
 
     if (action === "inn") {
       if (open) {
-        Alert.alert("Info", "Du er allerede stemplet inn.");
+        setQrNotice({
+          tone: "info",
+          title: "Ingen ny stempling",
+          message: "Du er allerede stemplet inn.",
+        });
         return;
       }
       innMutation.mutate(undefined, {
-        onSuccess: () => Alert.alert("Utført", "Stemplet inn."),
-        onError: (error) => Alert.alert("Feil", String(error)),
+        onSuccess: () =>
+          setQrNotice({
+            tone: "success",
+            title: "Stempling utført",
+            message: "Du er stemplet inn.",
+          }),
+        onError: (error) =>
+          setQrNotice({
+            tone: "error",
+            title: "Kunne ikke stemple inn",
+            message: String(error),
+          }),
       });
       return;
     }
 
     if (!open) {
-      Alert.alert("Info", "Ingen åpen stempling å stemple ut.");
+      setQrNotice({
+        tone: "error",
+        title: "Kunne ikke stemple ut",
+        message: "Ingen åpen stempling å stemple ut.",
+      });
       return;
     }
     utMutation.mutate(open.socio_deltakelseid, {
-      onSuccess: () => Alert.alert("Utført", "Stemplet ut."),
-      onError: (error) => Alert.alert("Feil", String(error)),
+      onSuccess: () =>
+        setQrNotice({
+          tone: "success",
+          title: "Stempling utført",
+          message: "Du er stemplet ut.",
+        }),
+      onError: (error) =>
+        setQrNotice({
+          tone: "error",
+          title: "Kunne ikke stemple ut",
+          message: String(error),
+        }),
     });
   }, [innMutation, isLoading, open, utMutation]);
 
@@ -85,7 +118,22 @@ export function HomeScreen({ navigation }: Props) {
       <Text style={[styles.userText, { fontSize: ty.bodyL }]}>
         Innlogget: {profile?.name || "Ukjent bruker"}
       </Text>
-      <Text style={[styles.buildText, { fontSize: ty.caption }]}>Build: {env.buildNumber}</Text>
+      {!!qrNotice && (
+        <View
+          style={[
+            styles.noticeCard,
+            qrNotice.tone === "success" && styles.noticeSuccess,
+            qrNotice.tone === "info" && styles.noticeInfo,
+            qrNotice.tone === "error" && styles.noticeError,
+          ]}
+        >
+          <Text style={[styles.noticeTitle, { fontSize: ty.bodyM }]}>{qrNotice.title}</Text>
+          <Text style={[styles.noticeMessage, { fontSize: ty.bodyS }]}>{qrNotice.message}</Text>
+          <Pressable onPress={() => setQrNotice(null)} style={styles.noticeCloseBtn}>
+            <Text style={[styles.noticeCloseText, { fontSize: ty.caption }]}>Lukk melding</Text>
+          </Pressable>
+        </View>
+      )}
       <View style={styles.statusCard}>
         <Text style={[styles.status, { fontSize: ty.bodyM }]}>{statusText}</Text>
       </View>
@@ -189,11 +237,6 @@ const styles = StyleSheet.create({
     color: theme.colors.text,
     textAlign: "center",
   },
-  buildText: {
-    color: theme.colors.muted,
-    textAlign: "center",
-    marginTop: -8,
-  },
   statusCard: {
     borderWidth: 3,
     borderColor: theme.colors.border,
@@ -204,6 +247,47 @@ const styles = StyleSheet.create({
   },
   status: {
     textAlign: "center",
+    color: theme.colors.text,
+    fontWeight: "600",
+  },
+  noticeCard: {
+    borderWidth: 2,
+    borderRadius: 14,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    gap: 4,
+  },
+  noticeSuccess: {
+    backgroundColor: "#e6efe7",
+    borderColor: theme.colors.primary,
+  },
+  noticeInfo: {
+    backgroundColor: "#eef2ff",
+    borderColor: theme.colors.border,
+  },
+  noticeError: {
+    backgroundColor: "#fdeaea",
+    borderColor: theme.colors.danger,
+  },
+  noticeTitle: {
+    fontWeight: "700",
+    color: theme.colors.text,
+  },
+  noticeMessage: {
+    color: theme.colors.text,
+    fontWeight: "500",
+  },
+  noticeCloseBtn: {
+    alignSelf: "flex-start",
+    marginTop: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    backgroundColor: "#fff",
+  },
+  noticeCloseText: {
     color: theme.colors.text,
     fontWeight: "600",
   },
