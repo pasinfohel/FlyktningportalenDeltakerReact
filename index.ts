@@ -3,6 +3,8 @@ import { registerRootComponent } from 'expo';
 import App from './App';
 
 if (typeof window !== 'undefined') {
+  const buildNumber = process.env.EXPO_PUBLIC_BUILD_NUMBER ?? 'local-dev';
+
   const ensurePwaHeadTags = () => {
     const hasManifest = document.querySelector('link[rel="manifest"]');
     if (!hasManifest) {
@@ -24,7 +26,30 @@ if (typeof window !== 'undefined') {
   const registerServiceWorker = async () => {
     if (!('serviceWorker' in navigator)) return;
     try {
-      await navigator.serviceWorker.register('/sw.js');
+      const registration = await navigator.serviceWorker.register(
+        `/sw.js?b=${encodeURIComponent(buildNumber)}`,
+      );
+
+      if (registration.waiting) {
+        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+      }
+
+      registration.addEventListener('updatefound', () => {
+        const installing = registration.installing;
+        if (!installing) return;
+        installing.addEventListener('statechange', () => {
+          if (installing.state === 'installed' && navigator.serviceWorker.controller) {
+            installing.postMessage({ type: 'SKIP_WAITING' });
+          }
+        });
+      });
+
+      let hasRefreshed = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (hasRefreshed) return;
+        hasRefreshed = true;
+        window.location.reload();
+      });
     } catch {
       // Service worker registration failure should not block app startup.
     }
