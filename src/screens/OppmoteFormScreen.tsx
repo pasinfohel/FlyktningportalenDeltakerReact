@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Alert, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import dayjs from "dayjs";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { DatePickerField } from "../components/DatePickerField";
 import { PrimaryButton } from "../components/PrimaryButton";
 import { theme } from "../config/theme";
 import { useDeleteMutation, useDeltakelser, useOppmoteMutation } from "../hooks/useDeltakelser";
@@ -75,12 +76,13 @@ export function OppmoteFormScreen({ route, navigation }: Props) {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={[styles.title, { fontSize: ty.titleL }]}>{title}</Text>
-      <Field
+      <DatePickerField
         label="Dato (YYYY-MM-DD)"
         value={dateInput}
-        onChangeText={setDateInput}
+        onChange={setDateInput}
         readOnly={isReadonly}
-        ty={ty}
+        minDate={dayjs(getStemplingCutoff()).format("YYYY-MM-DD")}
+        maxDate={dayjs().format("YYYY-MM-DD")}
       />
       <TimeRow
         label="Fra"

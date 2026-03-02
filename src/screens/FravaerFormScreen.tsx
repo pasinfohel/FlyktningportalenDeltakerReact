@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import dayjs from "dayjs";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { DatePickerField } from "../components/DatePickerField";
 import { PrimaryButton } from "../components/PrimaryButton";
 import { theme } from "../config/theme";
 import { useDeleteMutation, useDeltakelser, useFravaerMutation } from "../hooks/useDeltakelser";
@@ -93,19 +94,21 @@ export function FravaerFormScreen({ route, navigation }: Props) {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={[styles.title, { fontSize: ty.titleL }]}>{title}</Text>
-      <Field
+      <DatePickerField
         label="Fra dato (YYYY-MM-DD)"
         value={fromDate}
-        onChangeText={setFromDate}
+        onChange={setFromDate}
         readOnly={isReadonly}
-        ty={ty}
+        minDate={dayjs(getStemplingCutoff()).format("YYYY-MM-DD")}
+        maxDate={dayjs().add(1, "month").format("YYYY-MM-DD")}
       />
-      <Field
+      <DatePickerField
         label="Til dato (YYYY-MM-DD)"
         value={toDate}
-        onChangeText={setToDate}
+        onChange={setToDate}
         readOnly={isReadonly}
-        ty={ty}
+        minDate={fromDate}
+        maxDate={dayjs().add(1, "month").format("YYYY-MM-DD")}
       />
       <ToggleAllDay allDay={allDay} onToggle={() => setAllDay((p) => !p)} readOnly={isReadonly} ty={ty} />
       {!allDay && (
