@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { ActivityIndicator, Alert, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { PrimaryButton } from "../components/PrimaryButton";
@@ -9,6 +9,12 @@ import { useDeltakelser, useHomeState, useStemplingMutations } from "../hooks/us
 import { useTypography } from "../hooks/useTypography";
 import { RootStackParamList } from "../navigation/types";
 import { formatTimeLabel } from "../utils/date";
+import {
+  clearPendingStampAction,
+  clearStampActionParamsFromUrl,
+  getPendingStampAction,
+  parseStampActionFromUrl,
+} from "../utils/stampAction";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 
@@ -22,6 +28,7 @@ export function HomeScreen({ navigation }: Props) {
   const mainButtonHeight = Math.max(86, Math.min(124, Math.round(height * 0.13)));
   const footerHeight = Math.max(72, Math.round(height * 0.1));
   const mainGap = Math.max(12, Math.round(height * 0.018));
+  const hasHandledActionRef = useRef(false);
 
   const statusText = useMemo(() => {
     if (!latest) return "Ikke stemplet inn i dag";
@@ -30,6 +37,40 @@ export function HomeScreen({ navigation }: Props) {
     }
     return `Stemplet ut kl. ${formatTimeLabel(latest.socio_deltakelse_til)}`;
   }, [latest]);
+
+  useEffect(() => {
+    if (isLoading || hasHandledActionRef.current) return;
+
+    const actionFromUrl = parseStampActionFromUrl();
+    const pendingAction = getPendingStampAction();
+    const action = actionFromUrl ?? pendingAction;
+    if (!action) return;
+
+    hasHandledActionRef.current = true;
+    clearPendingStampAction();
+    clearStampActionParamsFromUrl();
+
+    if (action === "inn") {
+      if (open) {
+        Alert.alert("Info", "Du er allerede stemplet inn.");
+        return;
+      }
+      innMutation.mutate(undefined, {
+        onSuccess: () => Alert.alert("Utført", "Stemplet inn."),
+        onError: (error) => Alert.alert("Feil", String(error)),
+      });
+      return;
+    }
+
+    if (!open) {
+      Alert.alert("Info", "Ingen åpen stempling å stemple ut.");
+      return;
+    }
+    utMutation.mutate(open.socio_deltakelseid, {
+      onSuccess: () => Alert.alert("Utført", "Stemplet ut."),
+      onError: (error) => Alert.alert("Feil", String(error)),
+    });
+  }, [innMutation, isLoading, open, utMutation]);
 
   if (isLoading) {
     return (

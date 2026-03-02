@@ -7,6 +7,11 @@ import { env, validateEnv } from "../config/env";
 import { theme } from "../config/theme";
 import { useAuth } from "../context/AuthContext";
 import { useTypography } from "../hooks/useTypography";
+import {
+  clearStampActionParamsFromUrl,
+  parseStampActionFromUrl,
+  setPendingStampAction,
+} from "../utils/stampAction";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -32,6 +37,13 @@ export function LoginScreen() {
     },
     discovery,
   );
+
+  useEffect(() => {
+    const action = parseStampActionFromUrl();
+    if (!action) return;
+    setPendingStampAction(action);
+    clearStampActionParamsFromUrl();
+  }, []);
 
   useEffect(() => {
     async function complete() {
