@@ -13,7 +13,7 @@ Denne testplanen er laget for manuell verifisering av webappen.
 
 1. Kjor `npm install`
 2. Kjor `npm run start`
-3. Start app i nettleser (`npm run web`)
+3. Start app i nettleser
 
 Forventet:
 
@@ -181,17 +181,6 @@ Forventet:
 
 - Record settes inaktiv (`statecode=1`, `statuscode=2`).
 - Item forsvinner fra aktive oversikter.
-
-### TC-OPP-FORM-06: Cutoff read-only
-
-Steg:
-
-1. Apne et gammelt oppmøte (eldre enn cutoff)
-
-Forventet:
-
-- Skjerm er read-only.
-- `Lagre`/`Slett` vises ikke.
 
 ## 7. Oversikt fravær
 

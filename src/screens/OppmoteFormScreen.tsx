@@ -35,6 +35,14 @@ export function OppmoteFormScreen({ route, navigation }: Props) {
   }, [record]);
 
   const onSave = () => {
+    if (!dateInput.trim()) {
+      Alert.alert("Feil", "Fyll inn dato før du lagrer.");
+      return;
+    }
+    if (!fromTime || !toTime) {
+      Alert.alert("Feil", "Fyll inn både Fra-tid og Til-tid før du lagrer.");
+      return;
+    }
     const date = parseDateInput(dateInput);
     if (!date) {
       Alert.alert("Feil", "Ugyldig dato. Bruk format YYYY-MM-DD.");
@@ -103,7 +111,6 @@ export function OppmoteFormScreen({ route, navigation }: Props) {
       {!isReadonly && (
         <PrimaryButton
           label="Lagre"
-          loadingLabel="Lagre"
           icon="content-save-outline"
           size="md"
           textSize={ty.buttonMd}

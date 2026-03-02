@@ -42,6 +42,14 @@ export function FravaerFormScreen({ route, navigation }: Props) {
   }, [record]);
 
   const onSave = () => {
+    if (!fromDate.trim() || !toDate.trim()) {
+      Alert.alert("Feil", "Fyll inn både Fra dato og Til dato før du lagrer.");
+      return;
+    }
+    if (!allDay && (!fromTime || !toTime)) {
+      Alert.alert("Feil", "Fyll inn både Fra tid og Til tid før du lagrer.");
+      return;
+    }
     const from = parseDateInput(fromDate);
     const to = parseDateInput(toDate);
     if (!from || !to) {
@@ -138,7 +146,6 @@ export function FravaerFormScreen({ route, navigation }: Props) {
       {!isReadonly && (
         <PrimaryButton
           label="Lagre"
-          loadingLabel="Lagre"
           icon="content-save-outline"
           size="md"
           textSize={ty.buttonMd}

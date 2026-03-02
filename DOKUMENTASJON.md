@@ -1,6 +1,6 @@
 # Flyktningportalen Web - Dokumentasjon
 
-Denne dokumentasjonen beskriver webappen i `flyktningportalen-mobile` som er laget for aa speile Canvas-appen i `Flyktningportalen`.
+Denne dokumentasjonen beskriver webappen i `FlyktningportalenDeltakerReact` som er laget for aa speile Canvas-appen i `Flyktningportalen`.
 
 ## 1. Mal og formaal
 
@@ -27,7 +27,7 @@ I tillegg er layout og font/logikk tilpasset web/PWA med samme design-intensjon 
 ## 3. Prosjektstruktur
 
 ```text
-flyktningportalen-mobile/
+FlyktningportalenDeltakerReact/
   src/
     components/
       PrimaryButton.tsx
@@ -166,13 +166,12 @@ Fil: `src/types/domain.ts`
 
 ## 7.5 Oppmøte-form
 
-- New / Edit / Readonly styres av valgt record + cutoff-regel.
+- New / Edit styres av valgt record.
 - Validering:
   - datoformat `YYYY-MM-DD`
   - gyldig tid (00-23 / 00-59)
   - `Til` maa vaere etter `Fra`
   - kommentar maks 150 tegn
-  - dato eldre enn cutoff stoppes
 - Slett = soft delete.
 
 ## 7.6 Fravær-form
@@ -184,7 +183,6 @@ Fil: `src/types/domain.ts`
   - ved ikke-heldag: gyldig klokkeslett
   - hvis samme dato: `Til-tid > Fra-tid`
   - kommentar maks 150 tegn
-  - cutoff-regel
 - Slett = soft delete.
 
 ## 8. Typografi og skalering
@@ -218,7 +216,7 @@ Status: **Implementert i kode**, men maa bekreftes med manuell test i riktig mil
 - [x] INN/UT enable/disable styres av aaapen stempling
 - [x] Oppmøte-oversikt har filter "Må rettes"
 - [x] Fravær-oversikt viser kun fravær
-- [x] New/Edit/View-logikk med cutoff pa formskjermer
+- [x] New/Edit-logikk pa formskjermer
 - [x] Soft delete brukes i stedet for hard delete
 - [x] Kommentar-felt har tegnbegrensning
 - [x] Datofelter/tidsfelter valideres
@@ -290,4 +288,3 @@ Ved endringer:
   - nytt oppmøte/fravær
   - redigering
   - slett
-  - cutoff/read-only
