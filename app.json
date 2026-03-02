@@ -1,8 +1,7 @@
 {
   "expo": {
-    "name": "flyktningportalen-mobile",
-    "slug": "flyktningportalen-mobile",
-    "scheme": "flyktningportalenmobile",
+    "name": "flyktningportalen-web",
+    "slug": "flyktningportalen-web",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -11,18 +10,6 @@
       "image": "./assets/oslo-logo-512.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
-    },
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
-      },
-      "predictiveBackGestureEnabled": false
     },
     "web": {
       "favicon": "./assets/favicon.png",

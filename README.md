@@ -1,6 +1,6 @@
-# Flyktningportalen Mobile (React Native)
+# Flyktningportalen Web (SWA/PWA)
 
-Mobilapp som speiler Canvas-appen i dette repoet:
+Webapp som speiler Canvas-appen i dette repoet:
 
 - INN/UT-stempling
 - Oversikt for oppmøte og fravær
@@ -18,16 +18,10 @@ npm install
 
 2. Lag `.env` fra `.env.example` og fyll inn verdier.
 
-3. Start appen:
+3. Start appen lokalt:
 
 ```bash
 npm run start
-```
-
-For web lokalt:
-
-```bash
-npm run web
 ```
 
 For produksjonsbuild (web):
@@ -38,14 +32,12 @@ npm run build:web
 
 ## Viktig om Entra/Dataverse
 
-Du ma konfigurere App Registration i Entra ID (web-first for SWA/PWA):
+Du ma konfigurere App Registration i Entra ID:
 
 - Web redirect (Azure SWA): `https://<din-app>.azurestaticapps.net/auth`
 - Lokal web redirect (utvikling): `http://localhost:8081/auth` (eller porten Expo bruker)
 - Scope til Dataverse: `https://<org>.crm4.dynamics.com/user_impersonation`
 - Delegated permissions for Dataverse API
-
-Hvis du senere vil kjoere native app separat, kan du i tillegg registrere mobil redirect URI (`flyktningportalenmobile://auth`).
 
 ## Distribusjon via Azure Static Web Apps
 
@@ -65,7 +57,7 @@ Denne appen er satt opp for SWA-distribusjon av web-versjonen:
 
 ### Viktig
 
-SWA distribuerer web-klienten (og PWA-opplevelsen paa mobil/desktop). Native distribusjon (App Store/Google Play/MDM) krever egen native build/pipeline.
+SWA distribuerer web-klienten, inkludert PWA-opplevelse paa mobil og desktop.
 
 ## PWA-stotte
 

@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { ActivityIndicator, Alert, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { PrimaryButton } from "../components/PrimaryButton";
+import { env } from "../config/env";
 import { theme } from "../config/theme";
 import { useAuth } from "../context/AuthContext";
 import { useDeltakelser, useHomeState, useStemplingMutations } from "../hooks/useDeltakelser";
@@ -43,6 +44,7 @@ export function HomeScreen({ navigation }: Props) {
       <Text style={[styles.userText, { fontSize: ty.bodyL }]}>
         Innlogget: {profile?.name || "Ukjent bruker"}
       </Text>
+      <Text style={[styles.buildText, { fontSize: ty.caption }]}>Build: {env.buildNumber}</Text>
       <View style={styles.statusCard}>
         <Text style={[styles.status, { fontSize: ty.bodyM }]}>{statusText}</Text>
       </View>
@@ -145,6 +147,11 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: theme.colors.text,
     textAlign: "center",
+  },
+  buildText: {
+    color: theme.colors.muted,
+    textAlign: "center",
+    marginTop: -8,
   },
   statusCard: {
     borderWidth: 3,

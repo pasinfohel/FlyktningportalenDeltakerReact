@@ -34,7 +34,5 @@ if (typeof window !== 'undefined') {
   void registerServiceWorker();
 }
 
-// registerRootComponent calls AppRegistry.registerComponent('main', () => App);
-// It also ensures that whether you load the app in Expo Go or in a native build,
-// the environment is set up appropriately
+// registerRootComponent wires the Expo root entry for web/PWA runtime.
 registerRootComponent(App);

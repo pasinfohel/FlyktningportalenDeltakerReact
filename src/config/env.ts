@@ -5,6 +5,7 @@ export const env = {
   entraTenantId: process.env.EXPO_PUBLIC_ENTRA_TENANT_ID ?? "",
   entraClientId: process.env.EXPO_PUBLIC_ENTRA_CLIENT_ID ?? "",
   dataverseUrl,
+  buildNumber: process.env.EXPO_PUBLIC_BUILD_NUMBER ?? "local-dev",
   dataverseScope:
     process.env.EXPO_PUBLIC_DATAVERSE_SCOPE ??
     (dataverseHost ? `https://${dataverseHost}/user_impersonation` : ""),

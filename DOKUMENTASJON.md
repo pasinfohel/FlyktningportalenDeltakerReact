@@ -1,6 +1,6 @@
-# Flyktningportalen Mobile - Dokumentasjon
+# Flyktningportalen Web - Dokumentasjon
 
-Denne dokumentasjonen beskriver mobilappen i `flyktningportalen-mobile` som er laget for aa speile Canvas-appen i `Flyktningportalen`.
+Denne dokumentasjonen beskriver webappen i `flyktningportalen-mobile` som er laget for aa speile Canvas-appen i `Flyktningportalen`.
 
 ## 1. Mal og formaal
 
@@ -13,12 +13,12 @@ Appen skal levere samme kjernefunksjonalitet som Canvas-appen:
 - Innlogging med Entra ID
 - Bruk av samme Dataverse-data og option sets
 
-I tillegg er layout og font/logikk tilpasset mobil med samme design-intensjon som i Canvas (store primarknapper, footer-handlinger, tydelig status).
+I tillegg er layout og font/logikk tilpasset web/PWA med samme design-intensjon som i Canvas (store primarknapper, footer-handlinger, tydelig status).
 
 ## 2. Teknologistack
 
-- React Native (Expo) + TypeScript
-- React Navigation (native stack)
+- Expo Web + TypeScript
+- React Navigation (stack navigation)
 - React Query (`@tanstack/react-query`)
 - Entra ID OAuth2 PKCE via `expo-auth-session`
 - Lagring av token/session via browser `localStorage` (web/SWA)
@@ -90,7 +90,6 @@ EXPO_PUBLIC_DATAVERSE_SCOPE=https://flyktningportalenutvikling.crm4.dynamics.com
 
 - Primar redirect URI (SWA/web): `https://<din-app>.azurestaticapps.net/auth`
 - Lokal web redirect (utvikling): `http://localhost:8081/auth` (eller aktuell Expo-port)
-- Valgfritt ved native testing: `flyktningportalenmobile://auth`
 
 ## 6. Dataverse-integrasjon
 
@@ -223,7 +222,7 @@ Status: **Implementert i kode**, men maa bekreftes med manuell test i riktig mil
 - [x] Soft delete brukes i stedet for hard delete
 - [x] Kommentar-felt har tegnbegrensning
 - [x] Datofelter/tidsfelter valideres
-- [x] Mobil layout med tydelig footer-handlinger
+- [x] Responsiv web layout med tydelig footer-handlinger
 
 ## 10. Kjent gap / anbefalt neste steg
 

@@ -1,6 +1,6 @@
-# Testplan - Flyktningportalen Mobile
+# Testplan - Flyktningportalen Web (SWA/PWA)
 
-Denne testplanen er laget for manuell verifisering av mobilappen.
+Denne testplanen er laget for manuell verifisering av webappen.
 
 ## 1. Forutsetninger
 
