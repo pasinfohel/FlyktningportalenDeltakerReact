@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef } from "react";
-import { ActivityIndicator, Alert, StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ActivityIndicator, Alert, Modal, Pressable, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { PrimaryButton } from "../components/PrimaryButton";
 import { theme } from "../config/theme";
@@ -16,6 +16,10 @@ import {
 } from "../utils/stampAction";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Home">;
+type QrPopupState = {
+  title: string;
+  message: string;
+};
 
 export function HomeScreen({ navigation }: Props) {
   const { height } = useWindowDimensions();
@@ -28,6 +32,7 @@ export function HomeScreen({ navigation }: Props) {
   const footerHeight = Math.max(72, Math.round(height * 0.1));
   const mainGap = Math.max(12, Math.round(height * 0.018));
   const hasHandledActionRef = useRef(false);
+  const [qrPopup, setQrPopup] = useState<QrPopupState | null>(null);
 
   const statusText = useMemo(() => {
     if (!latest) return "Ikke stemplet inn i dag";
@@ -51,23 +56,45 @@ export function HomeScreen({ navigation }: Props) {
 
     if (action === "inn") {
       if (open) {
-        Alert.alert("Ingen ny stempling", "Du er allerede stemplet inn.");
+        setQrPopup({
+          title: "Ingen ny stempling",
+          message: "Du er allerede stemplet inn.",
+        });
         return;
       }
       innMutation.mutate(undefined, {
-        onSuccess: () => Alert.alert("Stempling utført", "Du er stemplet inn."),
-        onError: (error) => Alert.alert("Kunne ikke stemple inn", String(error)),
+        onSuccess: () =>
+          setQrPopup({
+            title: "Stempling utført",
+            message: "Du er stemplet inn.",
+          }),
+        onError: (error) =>
+          setQrPopup({
+            title: "Kunne ikke stemple inn",
+            message: String(error),
+          }),
       });
       return;
     }
 
     if (!open) {
-      Alert.alert("Kunne ikke stemple ut", "Ingen åpen stempling å stemple ut.");
+      setQrPopup({
+        title: "Kunne ikke stemple ut",
+        message: "Ingen åpen stempling å stemple ut.",
+      });
       return;
     }
     utMutation.mutate(open.socio_deltakelseid, {
-      onSuccess: () => Alert.alert("Stempling utført", "Du er stemplet ut."),
-      onError: (error) => Alert.alert("Kunne ikke stemple ut", String(error)),
+      onSuccess: () =>
+        setQrPopup({
+          title: "Stempling utført",
+          message: "Du er stemplet ut.",
+        }),
+      onError: (error) =>
+        setQrPopup({
+          title: "Kunne ikke stemple ut",
+          message: String(error),
+        }),
     });
   }, [innMutation, isLoading, open, utMutation]);
 
@@ -166,6 +193,23 @@ export function HomeScreen({ navigation }: Props) {
           style={styles.half}
         />
       </View>
+
+      <Modal transparent visible={Boolean(qrPopup)} animationType="fade" onRequestClose={() => setQrPopup(null)}>
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalCard}>
+            <Text style={[styles.modalTitle, { fontSize: ty.bodyL }]}>{qrPopup?.title}</Text>
+            <Text style={[styles.modalText, { fontSize: ty.bodyS }]}>{qrPopup?.message}</Text>
+            <PrimaryButton
+              label="OK"
+              size="md"
+              tone="muted"
+              textSize={ty.buttonMd}
+              iconSize={ty.iconMd}
+              onPress={() => setQrPopup(null)}
+            />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -215,5 +259,29 @@ const styles = StyleSheet.create({
   },
   half: {
     flex: 1,
+  },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.35)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  modalCard: {
+    width: "100%",
+    maxWidth: 420,
+    borderWidth: 2,
+    borderColor: theme.colors.border,
+    borderRadius: 16,
+    backgroundColor: theme.colors.card,
+    padding: 16,
+    gap: 12,
+  },
+  modalTitle: {
+    fontWeight: "700",
+    color: theme.colors.text,
+  },
+  modalText: {
+    color: theme.colors.text,
   },
 });
